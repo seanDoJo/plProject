@@ -8256,44 +8256,9 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Planner$generatePlannerItems = function (_p0) {
-	var _p1 = _p0;
-	var listItems = A2(
-		_elm_lang$core$List$map,
-		function (n) {
-			return A2(
-				_elm_lang$html$Html$li,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: n,
-					_1: {ctor: '[]'}
-				});
-		},
-		_p1.plannerItems);
-	return A2(
-		_elm_lang$html$Html$ul,
-		{ctor: '[]'},
-		listItems);
-};
 var _user$project$Planner$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$Planner$update = F2(
-	function (msg, model) {
-		var _p2 = msg;
-		if (_p2.ctor === 'StateUpdate') {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{state: _p2._0}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
-		} else {
-			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-		}
-	});
 var _user$project$Planner$Model = F2(
 	function (a, b) {
 		return {state: a, plannerItems: b};
@@ -8302,6 +8267,33 @@ var _user$project$Planner$Links = {ctor: 'Links'};
 var _user$project$Planner$OfficeHours = {ctor: 'OfficeHours'};
 var _user$project$Planner$Planner = {ctor: 'Planner'};
 var _user$project$Planner$PlannerCreate = {ctor: 'PlannerCreate'};
+var _user$project$Planner$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'StateUpdate') {
+			var _p2 = _p0._0;
+			var _p1 = model.state;
+			if (_p1.ctor === 'Planner') {
+				return (!_elm_lang$core$Native_Utils.eq(_p2, _user$project$Planner$PlannerCreate)) ? {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{state: _p2}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{state: _p2}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			}
+		} else {
+			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
 var _user$project$Planner$Start = {ctor: 'Start'};
 var _user$project$Planner$init = {
 	ctor: '_Tuple2',
@@ -8312,28 +8304,68 @@ var _user$project$Planner$init = {
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$Planner$Dummy = {ctor: 'Dummy'};
+var _user$project$Planner$StateUpdate = function (a) {
+	return {ctor: 'StateUpdate', _0: a};
+};
 var _user$project$Planner$generateSidebar = function (model) {
-	var menuItems = {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$a,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$Dummy),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Planner'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {
+	var plannerItem = _elm_lang$core$Native_Utils.eq(model.state, _user$project$Planner$Planner) ? A2(
+		_elm_lang$html$Html$li,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('selected-nav'),
+			_1: {ctor: '[]'}
+		},
+		{
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$a,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$Dummy),
+					_0: _elm_lang$html$Html_Events$onClick(
+						_user$project$Planner$StateUpdate(_user$project$Planner$Planner)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Planner'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		}) : A2(
+		_elm_lang$html$Html$li,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_user$project$Planner$StateUpdate(_user$project$Planner$Planner)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Planner'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+	var officeItem = _elm_lang$core$Native_Utils.eq(model.state, _user$project$Planner$OfficeHours) ? A2(
+		_elm_lang$html$Html$li,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('selected-nav'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_user$project$Planner$StateUpdate(_user$project$Planner$OfficeHours)),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -8341,20 +8373,79 @@ var _user$project$Planner$generateSidebar = function (model) {
 					_0: _elm_lang$html$Html$text('Office Hours'),
 					_1: {ctor: '[]'}
 				}),
+			_1: {ctor: '[]'}
+		}) : A2(
+		_elm_lang$html$Html$li,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_user$project$Planner$StateUpdate(_user$project$Planner$OfficeHours)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Office Hours'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+	var linksItem = _elm_lang$core$Native_Utils.eq(model.state, _user$project$Planner$Links) ? A2(
+		_elm_lang$html$Html$li,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('selected-nav'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_user$project$Planner$StateUpdate(_user$project$Planner$Links)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Links'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		}) : A2(
+		_elm_lang$html$Html$li,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_user$project$Planner$StateUpdate(_user$project$Planner$Links)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Links'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+	var menuItems = {
+		ctor: '::',
+		_0: plannerItem,
+		_1: {
+			ctor: '::',
+			_0: officeItem,
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$a,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$Dummy),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Links'),
-						_1: {ctor: '[]'}
-					}),
+				_0: linksItem,
 				_1: {ctor: '[]'}
 			}
 		}
@@ -8387,27 +8478,102 @@ var _user$project$Planner$generateSidebar = function (model) {
 						}),
 					_1: {ctor: '[]'}
 				}),
-			_1: A2(
-				_elm_lang$core$List$map,
-				function (n) {
-					return A2(
-						_elm_lang$html$Html$li,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: n,
-							_1: {ctor: '[]'}
-						});
-				},
-				menuItems)
+			_1: menuItems
 		});
 };
-var _user$project$Planner$StateUpdate = function (a) {
-	return {ctor: 'StateUpdate', _0: a};
+var _user$project$Planner$generatePlannerItems = function (_p3) {
+	var _p4 = _p3;
+	var _p5 = _p4.plannerItems;
+	if (_elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(_p5),
+		0)) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('container noplanning'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h3,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('you don\'t currently have anything today (hooray!)'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(
+									_user$project$Planner$StateUpdate(_user$project$Planner$PlannerCreate)),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Click Here to Make More!'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	} else {
+		var listItems = A2(
+			_elm_lang$core$List$map,
+			function (n) {
+				return A2(
+					_elm_lang$html$Html$li,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: n,
+						_1: {ctor: '[]'}
+					});
+			},
+			_p5);
+		return A2(
+			_elm_lang$html$Html$ul,
+			{ctor: '[]'},
+			listItems);
+	}
 };
 var _user$project$Planner$generateContent = function (model) {
-	var _p3 = model.state;
-	switch (_p3.ctor) {
+	var _p6 = model.state;
+	switch (_p6.ctor) {
 		case 'Start':
 			return A2(
 				_elm_lang$html$Html$div,
@@ -8415,11 +8581,22 @@ var _user$project$Planner$generateContent = function (model) {
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$h1,
-						{ctor: '[]'},
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Your Planner Made Easy'),
+							_0: _elm_lang$html$Html_Attributes$class('jumbotron'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h1,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Your Planner Made Easy'),
+									_1: {ctor: '[]'}
+								}),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -8428,9 +8605,13 @@ var _user$project$Planner$generateContent = function (model) {
 							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									_user$project$Planner$StateUpdate(_user$project$Planner$Planner)),
-								_1: {ctor: '[]'}
+								_0: _elm_lang$html$Html_Attributes$class('btn btn-primary btn-lg'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(
+										_user$project$Planner$StateUpdate(_user$project$Planner$Planner)),
+									_1: {ctor: '[]'}
+								}
 							},
 							{
 								ctor: '::',
@@ -8447,11 +8628,22 @@ var _user$project$Planner$generateContent = function (model) {
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$h1,
-						{ctor: '[]'},
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Items on Your Agenda'),
+							_0: _elm_lang$html$Html_Attributes$class('jumbotron'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h1,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Items on Your Agenda'),
+									_1: {ctor: '[]'}
+								}),
 							_1: {ctor: '[]'}
 						}),
 					_1: {

@@ -42,7 +42,13 @@ type Msg
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    StateUpdate newState -> ({model | state = newState}, Cmd.none)
+    StateUpdate newState -> (
+      case model.state of
+        Planner -> 
+          if newState /= PlannerCreate then ({model | state = newState}, Cmd.none)
+          else (model, Cmd.none)
+        _ -> ({model | state = newState}, Cmd.none)
+    )
 
     Dummy -> (model, Cmd.none)
 
@@ -63,25 +69,47 @@ subscriptions model =
 
 generateSidebar : Model -> Html Msg
 generateSidebar model =
+  let 
+    plannerItem 
+      = (
+        if model.state == Planner then li [ class "selected-nav" ] [ a [ onClick (StateUpdate Planner)  ] [ text "Planner" ] ]
+        else li [] [ a [ onClick (StateUpdate Planner)  ] [ text "Planner" ] ]
+      )
+  in
+  let
+    officeItem 
+      = (
+        if model.state == OfficeHours then li [ class "selected-nav" ] [ a [ onClick (StateUpdate OfficeHours)  ] [ text "Office Hours" ] ]
+        else li [] [ a [ onClick (StateUpdate OfficeHours)  ] [ text "Office Hours" ] ]
+      )
+  in
+  let
+    linksItem 
+      = (
+        if model.state == Links then li [ class "selected-nav" ] [ a [ onClick (StateUpdate Links)  ] [ text "Links" ] ]
+        else li [] [ a [ onClick (StateUpdate Links)  ] [ text "Links" ] ]
+      )
+  in
   let menuItems =
-    [ a [ onClick Dummy ] [ text "Planner" ]
-    , a [ onClick Dummy ] [ text "Office Hours" ]
-    , a [ onClick Dummy ] [ text "Links" ]
+    [ plannerItem
+    , officeItem
+    , linksItem
     ]
   in
-    ul [ class "sidebar-nav" ] ((li [ class "sidebar-brand" ] [ a [] [ text "Dynamic Planner" ] ]) :: (List.map (\n -> li [] [ n ]) (menuItems)))
+    ul [ class "sidebar-nav" ] ((li [ class "sidebar-brand" ] [ a [] [ text "Dynamic Planner" ] ]) :: menuItems)
+--    ul [ class "sidebar-nav" ] ((li [ class "sidebar-brand" ] [ a [] [ text "Dynamic Planner" ] ]) :: (List.map (\n -> li [] [ n ]) (menuItems)))
 
 generateContent : Model -> Html Msg
 generateContent model =
   case model.state of
     Start ->
        div []
-        [ h1 [] [ text "Your Planner Made Easy" ]
-        , button [ onClick (StateUpdate Planner) ] [ text "Get Started Now!" ]
+        [ div [ class "jumbotron" ] [ h1 [] [ text "Your Planner Made Easy" ] ]
+        , button [ class "btn btn-primary btn-lg", onClick (StateUpdate Planner) ] [ text "Get Started Now!" ]
         ]
     Planner ->
        div []
-        [ h1 [] [ text "Items on Your Agenda" ]
+        [ div [ class "jumbotron" ] [ h1 [] [ text "Items on Your Agenda" ] ]
         , generatePlannerItems model
         ]
     _ ->
@@ -91,7 +119,13 @@ generateContent model =
 
 generatePlannerItems : Model -> Html Msg
 generatePlannerItems {plannerItems} =
-  let
-    listItems = List.map (\n -> li [] [ n ]) (plannerItems)
-  in
-    ul [] listItems
+  if (List.length plannerItems) == 0 then
+    div [ style [ ("width", "100%") ] ] 
+    [ div [ class "container noplanning" ] [ h3 [ style [ ("color", "white") ] ] [ text "you don't currently have anything today (hooray!)" ] ]
+    , button [ class "btn btn-info btn-lg buttn-rgt", onClick (StateUpdate PlannerCreate) ] [ text "Click Here to Make More!" ]
+    ]
+  else
+    let
+      listItems = List.map (\n -> li [] [ n ]) (plannerItems)
+    in
+      ul [] listItems

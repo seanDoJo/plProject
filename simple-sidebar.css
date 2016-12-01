@@ -81,6 +81,19 @@
     cursor: pointer;
 }
 
+.sidebar-nav > .selected-nav {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .selected-nav a {
+		text-decoration: none;
+		color: #fff;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+}
+
 .sidebar-nav li a:active,
 .sidebar-nav li a:focus {
     text-decoration: none;
@@ -133,4 +146,19 @@
         position: relative;
         margin-right: 0;
     }
+}
+
+.noplanning {
+	position: absolute;
+	background: #118bc4;
+	border-radius: 5px;
+	width: auto;
+	float: left;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.buttn-rgt {
+	float: right;
+	margin-right: 1%;
 }
