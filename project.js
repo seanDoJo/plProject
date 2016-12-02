@@ -9898,68 +9898,202 @@ var _Bogdanp$elm_datepicker$DatePicker$update = F2(
 		}
 	});
 
+var _user$project$Planner$milliToWeeks = function (w) {
+	var weeks = _elm_lang$core$Basics$floor(w / ((((1000 * 60) * 60) * 24) * 7));
+	return (_elm_lang$core$Native_Utils.cmp(weeks, 0) > 0) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(weeks),
+		' Weeks ') : '';
+};
+var _user$project$Planner$milliToDays = function (m) {
+	var days = A2(
+		_elm_lang$core$Basics_ops['%'],
+		_elm_lang$core$Basics$ceiling(m / (((1000 * 60) * 60) * 24)),
+		7);
+	return (_elm_lang$core$Native_Utils.cmp(days, 0) > 0) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(days),
+		' Days') : '';
+};
+var _user$project$Planner$getDaysUntil = F2(
+	function (d, dtn) {
+		var _p0 = d;
+		if (_p0.ctor === 'Just') {
+			var dt = _elm_lang$core$Date$toTime(_p0._0);
+			var df = dt - dtn;
+			if (_elm_lang$core$Native_Utils.cmp(df, 0) < 1) {
+				return 'Task is Overdue!';
+			} else {
+				var weeks = _user$project$Planner$milliToWeeks(df);
+				var days = _user$project$Planner$milliToDays(df);
+				return (_elm_lang$core$Native_Utils.eq(weeks, '') && _elm_lang$core$Native_Utils.eq(days, '')) ? 'Due Today!' : A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Due in ',
+					A2(_elm_lang$core$Basics_ops['++'], weeks, days));
+			}
+		} else {
+			return 'ERROR';
+		}
+	});
+var _user$project$Planner$monthToString = function (m) {
+	var _p1 = m;
+	switch (_p1.ctor) {
+		case 'Jan':
+			return 'January';
+		case 'Feb':
+			return 'February';
+		case 'Mar':
+			return 'March';
+		case 'Apr':
+			return 'April';
+		case 'May':
+			return 'May';
+		case 'Jun':
+			return 'June';
+		case 'Jul':
+			return 'July';
+		case 'Aug':
+			return 'August';
+		case 'Sep':
+			return 'September';
+		case 'Oct':
+			return 'October';
+		case 'Nov':
+			return 'November';
+		default:
+			return 'December';
+	}
+};
+var _user$project$Planner$dayToString = function (d) {
+	var _p2 = d;
+	switch (_p2.ctor) {
+		case 'Mon':
+			return 'Monday';
+		case 'Tue':
+			return 'Tuesday';
+		case 'Wed':
+			return 'Wednesday';
+		case 'Thu':
+			return 'Thursday';
+		case 'Fri':
+			return 'Friday';
+		case 'Sat':
+			return 'Saturday';
+		default:
+			return 'Sunday';
+	}
+};
+var _user$project$Planner$formatDueDate = function (d) {
+	var _p3 = d;
+	if (_p3.ctor === 'Just') {
+		var _p4 = _p3._0;
+		var year = _elm_lang$core$Date$year(_p4);
+		var month = _user$project$Planner$monthToString(
+			_elm_lang$core$Date$month(_p4));
+		var nday = _elm_lang$core$Basics$toString(
+			_elm_lang$core$Date$day(_p4));
+		var day = _user$project$Planner$dayToString(
+			_elm_lang$core$Date$dayOfWeek(_p4));
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'bottom', _1: '0'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'left', _1: '0'},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'Due: ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							day,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									month,
+									A2(_elm_lang$core$Basics_ops['++'], ' ', nday)))))),
+				_1: {ctor: '[]'}
+			});
+	} else {
+		return _elm_lang$html$Html$text('ERROR');
+	}
+};
 var _user$project$Planner$comparePlannerItems = F2(
 	function (a, b) {
-		var _p0 = b;
-		var a2 = _p0._0;
-		var dt2 = _p0._1;
-		var _p1 = a;
-		var a1 = _p1._0;
-		var dt1 = _p1._1;
-		var _p2 = {ctor: '_Tuple2', _0: dt1, _1: dt2};
-		if (((_p2.ctor === '_Tuple2') && (_p2._0.ctor === 'Just')) && (_p2._1.ctor === 'Just')) {
+		var _p5 = b;
+		var a2 = _p5._0;
+		var dt2 = _p5._1;
+		var _p6 = a;
+		var a1 = _p6._0;
+		var dt1 = _p6._1;
+		var _p7 = {ctor: '_Tuple2', _0: dt1, _1: dt2};
+		if (((_p7.ctor === '_Tuple2') && (_p7._0.ctor === 'Just')) && (_p7._1.ctor === 'Just')) {
 			return A2(
 				_elm_lang$core$Basics$compare,
-				_elm_lang$core$Date$toTime(_p2._0._0),
-				_elm_lang$core$Date$toTime(_p2._1._0));
+				_elm_lang$core$Date$toTime(_p7._0._0),
+				_elm_lang$core$Date$toTime(_p7._1._0));
 		} else {
 			return _elm_lang$core$Basics$EQ;
 		}
 	});
 var _user$project$Planner$updatePlanner = function (model) {
-	var newItem = _elm_lang$html$Html$text(model.newTaskName);
-	return {
+	var newItem = A2(
+		_elm_lang$html$Html$h3,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(model.newTaskName),
+			_1: {ctor: '[]'}
+		});
+	var newL = {
 		ctor: '::',
 		_0: {ctor: '_Tuple2', _0: newItem, _1: model.date},
 		_1: model.plannerItems
 	};
+	return A2(_elm_lang$core$List$sortWith, _user$project$Planner$comparePlannerItems, newL);
 };
-var _user$project$Planner$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$none;
-};
-var _user$project$Planner$Model = F5(
-	function (a, b, c, d, e) {
-		return {state: a, plannerItems: b, newTaskName: c, date: d, datePicker: e};
+var _user$project$Planner$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {state: a, plannerItems: b, newTaskName: c, date: d, datePicker: e, currentTime: f};
 	});
 var _user$project$Planner$Links = {ctor: 'Links'};
 var _user$project$Planner$OfficeHours = {ctor: 'OfficeHours'};
 var _user$project$Planner$Planner = {ctor: 'Planner'};
 var _user$project$Planner$PlannerCreate = {ctor: 'PlannerCreate'};
 var _user$project$Planner$Start = {ctor: 'Start'};
+var _user$project$Planner$Tick = function (a) {
+	return {ctor: 'Tick', _0: a};
+};
+var _user$project$Planner$subscriptions = function (model) {
+	return A2(_elm_lang$core$Time$every, _elm_lang$core$Time$second, _user$project$Planner$Tick);
+};
 var _user$project$Planner$ToDatePicker = function (a) {
 	return {ctor: 'ToDatePicker', _0: a};
 };
 var _user$project$Planner$init = function () {
-	var isDisabled = function (date) {
-		return A3(
-			_elm_lang$core$Basics$flip,
-			_elm_lang$core$List$member,
-			{
-				ctor: '::',
-				_0: _elm_lang$core$Date$Sat,
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$core$Date$Sun,
-					_1: {ctor: '[]'}
-				}
-			},
-			_elm_lang$core$Date$dayOfWeek(date));
-	};
-	var _p3 = _Bogdanp$elm_datepicker$DatePicker$init(
+	var _p8 = _Bogdanp$elm_datepicker$DatePicker$init(
 		_elm_lang$core$Native_Utils.update(
 			_Bogdanp$elm_datepicker$DatePicker$defaultSettings,
 			{
-				isDisabled: isDisabled,
 				inputClassList: {
 					ctor: '::',
 					_0: {ctor: '_Tuple2', _0: 'form-control', _1: true},
@@ -9967,41 +10101,26 @@ var _user$project$Planner$init = function () {
 				},
 				inputName: _elm_lang$core$Maybe$Just('date')
 			}));
-	var datePicker = _p3._0;
-	var datePickerFx = _p3._1;
+	var datePicker = _p8._0;
+	var datePickerFx = _p8._1;
 	return {
 		ctor: '_Tuple2',
-		_0: A5(
+		_0: A6(
 			_user$project$Planner$Model,
 			_user$project$Planner$Start,
 			{ctor: '[]'},
 			'',
 			_elm_lang$core$Maybe$Nothing,
-			datePicker),
+			datePicker,
+			0),
 		_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Planner$ToDatePicker, datePickerFx)
 	};
 }();
 var _user$project$Planner$refreshDatePicker = function () {
-	var isDisabled = function (date) {
-		return A3(
-			_elm_lang$core$Basics$flip,
-			_elm_lang$core$List$member,
-			{
-				ctor: '::',
-				_0: _elm_lang$core$Date$Sat,
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$core$Date$Sun,
-					_1: {ctor: '[]'}
-				}
-			},
-			_elm_lang$core$Date$dayOfWeek(date));
-	};
-	var _p4 = _Bogdanp$elm_datepicker$DatePicker$init(
+	var _p9 = _Bogdanp$elm_datepicker$DatePicker$init(
 		_elm_lang$core$Native_Utils.update(
 			_Bogdanp$elm_datepicker$DatePicker$defaultSettings,
 			{
-				isDisabled: isDisabled,
 				inputClassList: {
 					ctor: '::',
 					_0: {ctor: '_Tuple2', _0: 'form-control', _1: true},
@@ -10009,8 +10128,8 @@ var _user$project$Planner$refreshDatePicker = function () {
 				},
 				inputName: _elm_lang$core$Maybe$Just('date')
 			}));
-	var datePicker = _p4._0;
-	var datePickerFx = _p4._1;
+	var datePicker = _p9._0;
+	var datePickerFx = _p9._1;
 	return {
 		ctor: '_Tuple2',
 		_0: datePicker,
@@ -10019,14 +10138,14 @@ var _user$project$Planner$refreshDatePicker = function () {
 }();
 var _user$project$Planner$update = F2(
 	function (msg, model) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
+		var _p10 = msg;
+		switch (_p10.ctor) {
 			case 'StateUpdate':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{state: _p5._0}),
+						{state: _p10._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'NewTaskName':
@@ -10034,14 +10153,14 @@ var _user$project$Planner$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{newTaskName: _p5._0}),
+						{newTaskName: _p10._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'NewTask':
 				var uitems = _user$project$Planner$updatePlanner(model);
-				var _p6 = _user$project$Planner$refreshDatePicker;
-				var dp = _p6._0;
-				var c = _p6._1;
+				var _p11 = _user$project$Planner$refreshDatePicker;
+				var dp = _p11._0;
+				var c = _p11._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -10049,17 +10168,17 @@ var _user$project$Planner$update = F2(
 						{newTaskName: '', plannerItems: uitems, state: _user$project$Planner$Planner, date: _elm_lang$core$Maybe$Nothing, datePicker: dp}),
 					_1: c
 				};
-			default:
-				var _p7 = A2(_Bogdanp$elm_datepicker$DatePicker$update, _p5._0, model.datePicker);
-				var newDatePicker = _p7._0;
-				var datePickerFx = _p7._1;
-				var mDate = _p7._2;
+			case 'ToDatePicker':
+				var _p12 = A2(_Bogdanp$elm_datepicker$DatePicker$update, _p10._0, model.datePicker);
+				var newDatePicker = _p12._0;
+				var datePickerFx = _p12._1;
+				var mDate = _p12._2;
 				var date = function () {
-					var _p8 = mDate;
-					if (_p8.ctor === 'Nothing') {
+					var _p13 = mDate;
+					if (_p13.ctor === 'Nothing') {
 						return model.date;
 					} else {
-						return _p8;
+						return _p13;
 					}
 				}();
 				return {
@@ -10068,6 +10187,14 @@ var _user$project$Planner$update = F2(
 						model,
 						{date: date, datePicker: newDatePicker}),
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Planner$ToDatePicker, datePickerFx)
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{currentTime: _p10._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
 	});
@@ -10364,11 +10491,11 @@ var _user$project$Planner$generateSidebar = function (model) {
 			_1: menuItems
 		});
 };
-var _user$project$Planner$generatePlannerItems = function (_p9) {
-	var _p10 = _p9;
-	var _p13 = _p10.plannerItems;
+var _user$project$Planner$generatePlannerItems = function (_p14) {
+	var _p15 = _p14;
+	var _p19 = _p15.plannerItems;
 	if (_elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(_p13),
+		_elm_lang$core$List$length(_p19),
 		0)) {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -10437,18 +10564,39 @@ var _user$project$Planner$generatePlannerItems = function (_p9) {
 	} else {
 		var listItems = A2(
 			_elm_lang$core$List$map,
-			function (_p11) {
-				var _p12 = _p11;
+			function (_p16) {
+				var _p17 = _p16;
+				var _p18 = _p17._1;
 				return A2(
 					_elm_lang$html$Html$li,
-					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _p12._0,
+						_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _p17._0,
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										A2(_user$project$Planner$getDaysUntil, _p18, _p15.currentTime)),
+									_1: {
+										ctor: '::',
+										_0: _user$project$Planner$formatDueDate(_p18),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
 						_1: {ctor: '[]'}
 					});
 			},
-			A2(_elm_lang$core$List$sortWith, _user$project$Planner$comparePlannerItems, _p13));
+			_p19);
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -10474,7 +10622,11 @@ var _user$project$Planner$generatePlannerItems = function (_p9) {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$ul,
-							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('list-group'),
+								_1: {ctor: '[]'}
+							},
 							listItems),
 						_1: {ctor: '[]'}
 					}),
@@ -10503,8 +10655,8 @@ var _user$project$Planner$generatePlannerItems = function (_p9) {
 	}
 };
 var _user$project$Planner$generateContent = function (model) {
-	var _p14 = model.state;
-	switch (_p14.ctor) {
+	var _p20 = model.state;
+	switch (_p20.ctor) {
 		case 'Start':
 			return A2(
 				_elm_lang$html$Html$div,

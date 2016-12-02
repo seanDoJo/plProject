@@ -5,6 +5,7 @@ import DatePicker exposing (defaultSettings)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Time exposing (Time, second)
 
 import List
 
@@ -31,31 +32,28 @@ type alias Model =
   , newTaskName : String
   , date : Maybe Date
   , datePicker : DatePicker.DatePicker
+  , currentTime : Time
   }
 
 init : (Model, Cmd Msg)
 init =
   let
-    isDisabled date = flip List.member [ Sat, Sun ] (dayOfWeek date)
     ( datePicker, datePickerFx ) =
       DatePicker.init
         { defaultSettings
-            | isDisabled = isDisabled
-            , inputClassList = [ ( "form-control", True ) ]
+            | inputClassList = [ ( "form-control", True ) ]
             , inputName = Just "date"
     }
   in
-    (Model Start [] "" Nothing datePicker, Cmd.map ToDatePicker datePickerFx)
+    (Model Start [] "" Nothing datePicker 0, Cmd.map ToDatePicker datePickerFx)
 
 refreshDatePicker : (DatePicker.DatePicker, Cmd Msg)
 refreshDatePicker =
   let
-    isDisabled date = flip List.member [ Sat, Sun ] (dayOfWeek date)
     ( datePicker, datePickerFx ) =
       DatePicker.init
         { defaultSettings
-            | isDisabled = isDisabled
-            , inputClassList = [ ( "form-control", True ) ]
+            | inputClassList = [ ( "form-control", True ) ]
             , inputName = Just "date"
     }
   in
@@ -68,6 +66,7 @@ type Msg
   | NewTaskName String
   | NewTask
   | ToDatePicker DatePicker.Msg
+  | Tick Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -97,6 +96,9 @@ update msg model =
         ({model | date = date, datePicker = newDatePicker},
           Cmd.map ToDatePicker datePickerFx)
 
+    Tick newTime ->
+      ({model | currentTime = newTime}, Cmd.none)
+
 -- VIEW
 
 view : Model -> Html Msg
@@ -110,7 +112,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  Time.every second Tick
 
 generateSidebar : Model -> Html Msg
 generateSidebar model =
@@ -168,7 +170,7 @@ generateContent model =
         ]
 
 generatePlannerItems : Model -> Html Msg
-generatePlannerItems {plannerItems} =
+generatePlannerItems {plannerItems, currentTime} =
   if (List.length plannerItems) == 0 then
     div [ style [ ("width", "100%") ] ] 
     [ div [ class "container noplanning" ] [ h3 [ style [ ("color", "white") ] ] [ text "you don't currently have anything today (hooray!)" ] ]
@@ -176,10 +178,19 @@ generatePlannerItems {plannerItems} =
     ]
   else
     let
-      listItems = List.map (\(n,d) -> li [] [ n ]) (List.sortWith comparePlannerItems plannerItems)
+      listItems = 
+        List.map (\(n,d) -> 
+          li [ class "list-group-item" ] 
+          [ div [] 
+            [ n
+            , text (getDaysUntil d currentTime)
+            , formatDueDate d 
+            ]
+          ] 
+        ) (plannerItems)
     in
       div [ style [ ("width", "100%") ] ]
-      [ div [ class "container noplanning" ] [ ul [] listItems ]
+      [ div [ class "container noplanning" ] [ ul [ class "list-group" ] listItems ]
       , button [ class "btn btn-info btn-lg buttn-rgt", onClick (StateUpdate PlannerCreate) ] [ text "Click Here to Make More!" ]
       ]
 
@@ -200,9 +211,12 @@ generateNewPlannerItem model =
 updatePlanner : Model -> List ((Html Msg, Maybe Date))
 updatePlanner model =
   let
-    newItem = text model.newTaskName
+    newItem = h3 [ style [] ] [ text model.newTaskName ]
   in
-    (newItem, model.date) :: model.plannerItems
+    let
+      newL = (newItem, model.date) :: model.plannerItems
+    in
+      List.sortWith comparePlannerItems newL
 
 comparePlannerItems a b =
   let
@@ -213,3 +227,84 @@ comparePlannerItems a b =
       (Just d1, Just d2) ->
         compare (Date.toTime d1) (Date.toTime d2)
       _ -> EQ
+
+formatDueDate : Maybe Date -> Html msg
+formatDueDate d =
+  case d of
+    Just date ->
+      let
+        day = dayToString (Date.dayOfWeek date)
+        nday = toString (Date.day date)
+        month = monthToString (Date.month date)
+        year = Date.year date
+      in
+        div [ style [ ("bottom", "0"), ("left", "0") ] ] [ text ("Due: " ++ day ++ ", " ++ month ++ " " ++ nday) ]
+    Nothing -> text "ERROR"
+
+dayToString : Date.Day -> String
+dayToString d =
+  case d of
+    Mon -> "Monday"
+    Tue -> "Tuesday"
+    Wed -> "Wednesday"
+    Thu -> "Thursday"
+    Fri -> "Friday"
+    Sat -> "Saturday"
+    Sun -> "Sunday"
+
+monthToString : Date.Month -> String
+monthToString m =
+  case m of
+    Date.Jan -> "January"
+    Date.Feb -> "February"
+    Date.Mar -> "March"
+    Date.Apr -> "April"
+    Date.May -> "May"
+    Date.Jun -> "June"
+    Date.Jul -> "July"
+    Date.Aug -> "August"
+    Date.Sep -> "September"
+    Date.Oct -> "October"
+    Date.Nov -> "November"
+    Date.Dec -> "December"
+
+getDaysUntil : Maybe Date -> Float -> String
+getDaysUntil d dtn =
+  case d of
+    Just date ->
+      let
+        dt = Date.toTime date
+        df = dt - dtn
+      in
+        if df <= 0 then
+          "Task is Overdue!"
+        else
+          let
+            days = milliToDays df
+            weeks = milliToWeeks df
+          in
+            if weeks == "" && days == "" then
+              "Due Today!"
+            else
+              "Due in " ++ weeks ++ days
+    Nothing -> "ERROR"
+
+milliToDays : Float -> String
+milliToDays m =
+  let
+    days = (ceiling (m / (1000 * 60 * 60 * 24))) % 7
+  in
+    if days > 0 then
+       (toString days) ++ " Days"
+    else
+      ""
+
+milliToWeeks : Float -> String
+milliToWeeks w =
+  let
+    weeks = floor (w / (1000 * 60 * 60 * 24 * 7))
+  in
+    if weeks > 0 then
+      (toString weeks) ++ " Weeks "
+    else
+      ""
