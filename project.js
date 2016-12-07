@@ -9898,12 +9898,42 @@ var _Bogdanp$elm_datepicker$DatePicker$update = F2(
 		}
 	});
 
+var _user$project$Planner$selectItem = F2(
+	function (i, s) {
+		var firstTaken = A2(_elm_lang$core$List$take, i + 1, s);
+		var item = A2(_elm_lang$core$List$drop, i, firstTaken);
+		var _p0 = item;
+		if (_p0.ctor === '::') {
+			return _p0._0;
+		} else {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$html$Html$text('ERROR'),
+				_1: _elm_lang$core$Maybe$Nothing
+			};
+		}
+	});
+var _user$project$Planner$removeItem = F2(
+	function (i, s) {
+		var firstDropped = A2(_elm_lang$core$List$drop, i + 1, s);
+		var firstTaken = A2(_elm_lang$core$List$take, i, s);
+		return A2(_elm_lang$core$Basics_ops['++'], firstTaken, firstDropped);
+	});
+var _user$project$Planner$milliToWeeksn = function (w) {
+	return _elm_lang$core$Basics$floor(w / ((((1000 * 60) * 60) * 24) * 7));
+};
 var _user$project$Planner$milliToWeeks = function (w) {
 	var weeks = _elm_lang$core$Basics$floor(w / ((((1000 * 60) * 60) * 24) * 7));
 	return (_elm_lang$core$Native_Utils.cmp(weeks, 0) > 0) ? A2(
 		_elm_lang$core$Basics_ops['++'],
 		_elm_lang$core$Basics$toString(weeks),
 		' Weeks ') : '';
+};
+var _user$project$Planner$milliToDaysn = function (m) {
+	return A2(
+		_elm_lang$core$Basics_ops['%'],
+		_elm_lang$core$Basics$ceiling(m / (((1000 * 60) * 60) * 24)),
+		7);
 };
 var _user$project$Planner$milliToDays = function (m) {
 	var days = A2(
@@ -9917,27 +9947,142 @@ var _user$project$Planner$milliToDays = function (m) {
 };
 var _user$project$Planner$getDaysUntil = F2(
 	function (d, dtn) {
-		var _p0 = d;
-		if (_p0.ctor === 'Just') {
-			var dt = _elm_lang$core$Date$toTime(_p0._0);
+		var _p1 = d;
+		if (_p1.ctor === 'Just') {
+			var dt = _elm_lang$core$Date$toTime(_p1._0);
 			var df = dt - dtn;
 			if (_elm_lang$core$Native_Utils.cmp(df, 0) < 1) {
-				return 'Task is Overdue!';
+				return A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'color', _1: 'red'},
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Task is Overdue!'),
+						_1: {ctor: '[]'}
+					});
 			} else {
 				var weeks = _user$project$Planner$milliToWeeks(df);
 				var days = _user$project$Planner$milliToDays(df);
-				return (_elm_lang$core$Native_Utils.eq(weeks, '') && _elm_lang$core$Native_Utils.eq(days, '')) ? 'Due Today!' : A2(
-					_elm_lang$core$Basics_ops['++'],
-					'Due in ',
-					A2(_elm_lang$core$Basics_ops['++'], weeks, days));
+				if (_elm_lang$core$Native_Utils.eq(weeks, '') && _elm_lang$core$Native_Utils.eq(days, '')) {
+					return A2(
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'color', _1: 'red'},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Due Today!'),
+							_1: {ctor: '[]'}
+						});
+				} else {
+					var weeksn = _user$project$Planner$milliToWeeksn(df);
+					var daysn = _user$project$Planner$milliToDaysn(df);
+					return (_elm_lang$core$Native_Utils.cmp(weeksn, 0) < 1) ? ((_elm_lang$core$Native_Utils.cmp(daysn, 3) < 1) ? A2(
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'color', _1: 'red'},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Due in ',
+									A2(_elm_lang$core$Basics_ops['++'], weeks, days))),
+							_1: {ctor: '[]'}
+						}) : ((_elm_lang$core$Native_Utils.cmp(daysn, 5) < 1) ? A2(
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'color', _1: 'orange'},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Due in ',
+									A2(_elm_lang$core$Basics_ops['++'], weeks, days))),
+							_1: {ctor: '[]'}
+						}) : A2(
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'color', _1: 'green'},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Due in ',
+									A2(_elm_lang$core$Basics_ops['++'], weeks, days))),
+							_1: {ctor: '[]'}
+						}))) : A2(
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'color', _1: 'green'},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Due in ',
+									A2(_elm_lang$core$Basics_ops['++'], weeks, days))),
+							_1: {ctor: '[]'}
+						});
+				}
 			}
 		} else {
-			return 'ERROR';
+			return _elm_lang$html$Html$text('ERROR');
 		}
 	});
 var _user$project$Planner$monthToString = function (m) {
-	var _p1 = m;
-	switch (_p1.ctor) {
+	var _p2 = m;
+	switch (_p2.ctor) {
 		case 'Jan':
 			return 'January';
 		case 'Feb':
@@ -9965,8 +10110,8 @@ var _user$project$Planner$monthToString = function (m) {
 	}
 };
 var _user$project$Planner$dayToString = function (d) {
-	var _p2 = d;
-	switch (_p2.ctor) {
+	var _p3 = d;
+	switch (_p3.ctor) {
 		case 'Mon':
 			return 'Monday';
 		case 'Tue':
@@ -9984,16 +10129,16 @@ var _user$project$Planner$dayToString = function (d) {
 	}
 };
 var _user$project$Planner$formatDueDate = function (d) {
-	var _p3 = d;
-	if (_p3.ctor === 'Just') {
-		var _p4 = _p3._0;
-		var year = _elm_lang$core$Date$year(_p4);
+	var _p4 = d;
+	if (_p4.ctor === 'Just') {
+		var _p5 = _p4._0;
+		var year = _elm_lang$core$Date$year(_p5);
 		var month = _user$project$Planner$monthToString(
-			_elm_lang$core$Date$month(_p4));
+			_elm_lang$core$Date$month(_p5));
 		var nday = _elm_lang$core$Basics$toString(
-			_elm_lang$core$Date$day(_p4));
+			_elm_lang$core$Date$day(_p5));
 		var day = _user$project$Planner$dayToString(
-			_elm_lang$core$Date$dayOfWeek(_p4));
+			_elm_lang$core$Date$dayOfWeek(_p5));
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -10015,17 +10160,14 @@ var _user$project$Planner$formatDueDate = function (d) {
 				_0: _elm_lang$html$Html$text(
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						'Due: ',
+						day,
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							day,
+							', ',
 							A2(
 								_elm_lang$core$Basics_ops['++'],
-								', ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									month,
-									A2(_elm_lang$core$Basics_ops['++'], ' ', nday)))))),
+								month,
+								A2(_elm_lang$core$Basics_ops['++'], ' ', nday))))),
 				_1: {ctor: '[]'}
 			});
 	} else {
@@ -10034,21 +10176,30 @@ var _user$project$Planner$formatDueDate = function (d) {
 };
 var _user$project$Planner$comparePlannerItems = F2(
 	function (a, b) {
-		var _p5 = b;
-		var a2 = _p5._0;
-		var dt2 = _p5._1;
-		var _p6 = a;
-		var a1 = _p6._0;
-		var dt1 = _p6._1;
-		var _p7 = {ctor: '_Tuple2', _0: dt1, _1: dt2};
-		if (((_p7.ctor === '_Tuple2') && (_p7._0.ctor === 'Just')) && (_p7._1.ctor === 'Just')) {
+		var _p6 = b;
+		var a2 = _p6._0;
+		var dt2 = _p6._1;
+		var _p7 = a;
+		var a1 = _p7._0;
+		var dt1 = _p7._1;
+		var _p8 = {ctor: '_Tuple2', _0: dt1, _1: dt2};
+		if (((_p8.ctor === '_Tuple2') && (_p8._0.ctor === 'Just')) && (_p8._1.ctor === 'Just')) {
 			return A2(
 				_elm_lang$core$Basics$compare,
-				_elm_lang$core$Date$toTime(_p7._0._0),
-				_elm_lang$core$Date$toTime(_p7._1._0));
+				_elm_lang$core$Date$toTime(_p8._0._0),
+				_elm_lang$core$Date$toTime(_p8._1._0));
 		} else {
 			return _elm_lang$core$Basics$EQ;
 		}
+	});
+var _user$project$Planner$updateCompleted = F2(
+	function (item, model) {
+		return {ctor: '::', _0: item, _1: model.completedItems};
+	});
+var _user$project$Planner$updatePlannerItem = F2(
+	function (item, model) {
+		var newL = {ctor: '::', _0: item, _1: model.plannerItems};
+		return A2(_elm_lang$core$List$sortWith, _user$project$Planner$comparePlannerItems, newL);
 	});
 var _user$project$Planner$updatePlanner = function (model) {
 	var newItem = A2(
@@ -10071,15 +10222,143 @@ var _user$project$Planner$updatePlanner = function (model) {
 	};
 	return A2(_elm_lang$core$List$sortWith, _user$project$Planner$comparePlannerItems, newL);
 };
-var _user$project$Planner$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {state: a, plannerItems: b, newTaskName: c, date: d, datePicker: e, currentTime: f};
+var _user$project$Planner$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {state: a, plannerItems: b, completedItems: c, newTaskName: d, date: e, datePicker: f, currentTime: g};
 	});
 var _user$project$Planner$Links = {ctor: 'Links'};
 var _user$project$Planner$OfficeHours = {ctor: 'OfficeHours'};
 var _user$project$Planner$Planner = {ctor: 'Planner'};
 var _user$project$Planner$PlannerCreate = {ctor: 'PlannerCreate'};
 var _user$project$Planner$Start = {ctor: 'Start'};
+var _user$project$Planner$Replace = function (a) {
+	return {ctor: 'Replace', _0: a};
+};
+var _user$project$Planner$generateCompleted = function (model) {
+	return A2(
+		_elm_lang$core$List$indexedMap,
+		F2(
+			function (index, e) {
+				var _p9 = e;
+				var n = _p9._0;
+				var d = _p9._1;
+				return A2(
+					_elm_lang$html$Html$li,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'margin', _1: '10px'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '5px'},
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'width', _1: '50%'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: n,
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Completed'),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('pull-right'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$style(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'width', _1: '45%'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+														_1: {ctor: '[]'}
+													}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('ucontainer'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													_user$project$Planner$Replace(index)),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$img,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('checkmark'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$src('undo1.png'),
+														_1: {ctor: '[]'}
+													}
+												},
+												{ctor: '[]'}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					});
+			}),
+		model.completedItems);
+};
+var _user$project$Planner$RemoveItem = function (a) {
+	return {ctor: 'RemoveItem', _0: a};
+};
+var _user$project$Planner$CompleteItem = function (a) {
+	return {ctor: 'CompleteItem', _0: a};
+};
 var _user$project$Planner$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
 };
@@ -10090,7 +10369,7 @@ var _user$project$Planner$ToDatePicker = function (a) {
 	return {ctor: 'ToDatePicker', _0: a};
 };
 var _user$project$Planner$init = function () {
-	var _p8 = _Bogdanp$elm_datepicker$DatePicker$init(
+	var _p10 = _Bogdanp$elm_datepicker$DatePicker$init(
 		_elm_lang$core$Native_Utils.update(
 			_Bogdanp$elm_datepicker$DatePicker$defaultSettings,
 			{
@@ -10101,13 +10380,14 @@ var _user$project$Planner$init = function () {
 				},
 				inputName: _elm_lang$core$Maybe$Just('date')
 			}));
-	var datePicker = _p8._0;
-	var datePickerFx = _p8._1;
+	var datePicker = _p10._0;
+	var datePickerFx = _p10._1;
 	return {
 		ctor: '_Tuple2',
-		_0: A6(
+		_0: A7(
 			_user$project$Planner$Model,
 			_user$project$Planner$Start,
+			{ctor: '[]'},
 			{ctor: '[]'},
 			'',
 			_elm_lang$core$Maybe$Nothing,
@@ -10117,7 +10397,7 @@ var _user$project$Planner$init = function () {
 	};
 }();
 var _user$project$Planner$refreshDatePicker = function () {
-	var _p9 = _Bogdanp$elm_datepicker$DatePicker$init(
+	var _p11 = _Bogdanp$elm_datepicker$DatePicker$init(
 		_elm_lang$core$Native_Utils.update(
 			_Bogdanp$elm_datepicker$DatePicker$defaultSettings,
 			{
@@ -10128,8 +10408,8 @@ var _user$project$Planner$refreshDatePicker = function () {
 				},
 				inputName: _elm_lang$core$Maybe$Just('date')
 			}));
-	var datePicker = _p9._0;
-	var datePickerFx = _p9._1;
+	var datePicker = _p11._0;
+	var datePickerFx = _p11._1;
 	return {
 		ctor: '_Tuple2',
 		_0: datePicker,
@@ -10138,14 +10418,14 @@ var _user$project$Planner$refreshDatePicker = function () {
 }();
 var _user$project$Planner$update = F2(
 	function (msg, model) {
-		var _p10 = msg;
-		switch (_p10.ctor) {
+		var _p12 = msg;
+		switch (_p12.ctor) {
 			case 'StateUpdate':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{state: _p10._0}),
+						{state: _p12._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'NewTaskName':
@@ -10153,14 +10433,14 @@ var _user$project$Planner$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{newTaskName: _p10._0}),
+						{newTaskName: _p12._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'NewTask':
 				var uitems = _user$project$Planner$updatePlanner(model);
-				var _p11 = _user$project$Planner$refreshDatePicker;
-				var dp = _p11._0;
-				var c = _p11._1;
+				var _p13 = _user$project$Planner$refreshDatePicker;
+				var dp = _p13._0;
+				var c = _p13._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -10168,17 +10448,28 @@ var _user$project$Planner$update = F2(
 						{newTaskName: '', plannerItems: uitems, state: _user$project$Planner$Planner, date: _elm_lang$core$Maybe$Nothing, datePicker: dp}),
 					_1: c
 				};
+			case 'CancelTask':
+				var _p14 = _user$project$Planner$refreshDatePicker;
+				var dp = _p14._0;
+				var c = _p14._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{newTaskName: '', state: _user$project$Planner$Planner, date: _elm_lang$core$Maybe$Nothing, datePicker: dp}),
+					_1: c
+				};
 			case 'ToDatePicker':
-				var _p12 = A2(_Bogdanp$elm_datepicker$DatePicker$update, _p10._0, model.datePicker);
-				var newDatePicker = _p12._0;
-				var datePickerFx = _p12._1;
-				var mDate = _p12._2;
+				var _p15 = A2(_Bogdanp$elm_datepicker$DatePicker$update, _p12._0, model.datePicker);
+				var newDatePicker = _p15._0;
+				var datePickerFx = _p15._1;
+				var mDate = _p15._2;
 				var date = function () {
-					var _p13 = mDate;
-					if (_p13.ctor === 'Nothing') {
+					var _p16 = mDate;
+					if (_p16.ctor === 'Nothing') {
 						return model.date;
 					} else {
-						return _p13;
+						return _p16;
 					}
 				}();
 				return {
@@ -10188,137 +10479,122 @@ var _user$project$Planner$update = F2(
 						{date: date, datePicker: newDatePicker}),
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Planner$ToDatePicker, datePickerFx)
 				};
-			default:
+			case 'Tick':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{currentTime: _p10._0}),
+						{currentTime: _p12._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'CompleteItem':
+				var _p17 = _p12._0;
+				var remaining = A2(_user$project$Planner$removeItem, _p17, model.plannerItems);
+				var item = A2(_user$project$Planner$selectItem, _p17, model.plannerItems);
+				var completed = A2(_user$project$Planner$updateCompleted, item, model);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{plannerItems: remaining, completedItems: completed}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'RemoveItem':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							plannerItems: A2(_user$project$Planner$removeItem, _p12._0, model.plannerItems)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				var _p18 = _p12._0;
+				var remaining = A2(_user$project$Planner$removeItem, _p18, model.completedItems);
+				var item = A2(_user$project$Planner$selectItem, _p18, model.completedItems);
+				var updated = A2(_user$project$Planner$updatePlannerItem, item, model);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{plannerItems: updated, completedItems: remaining}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
 	});
+var _user$project$Planner$CancelTask = {ctor: 'CancelTask'};
 var _user$project$Planner$NewTask = {ctor: 'NewTask'};
-var _user$project$Planner$NewTaskName = function (a) {
-	return {ctor: 'NewTaskName', _0: a};
-};
-var _user$project$Planner$generateNewPlannerItem = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('form-group'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$label,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$style(
-								{
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'for', _1: 'newName'},
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Task Name'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('text'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$placeholder('Task Name'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Planner$NewTaskName),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('form-control'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$id('newName'),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {
+var _user$project$Planner$validateNewTask = function (model) {
+	var exist = !_elm_lang$core$String$isEmpty(model.newTaskName);
+	var _p19 = model.date;
+	if (_p19.ctor === 'Just') {
+		return exist ? A2(
+			_elm_lang$html$Html$button,
+			{
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('form-group'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$label,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Due Date'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$map,
-								_user$project$Planner$ToDatePicker,
-								_Bogdanp$elm_datepicker$DatePicker$view(model.datePicker)),
-							_1: {ctor: '[]'}
-						}
-					}),
+				_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('btn btn-primary btn-lg'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$NewTask),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Create'),
-							_1: {ctor: '[]'}
-						}),
+					_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$NewTask),
 					_1: {ctor: '[]'}
 				}
-			}
-		});
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Add Task'),
+				_1: {ctor: '[]'}
+			}) : A2(
+			_elm_lang$html$Html$button,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$NewTask),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$disabled(true),
+						_1: {ctor: '[]'}
+					}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Add Task'),
+				_1: {ctor: '[]'}
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$button,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$NewTask),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$disabled(true),
+						_1: {ctor: '[]'}
+					}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Add Task'),
+				_1: {ctor: '[]'}
+			});
+	}
+};
+var _user$project$Planner$NewTaskName = function (a) {
+	return {ctor: 'NewTaskName', _0: a};
 };
 var _user$project$Planner$StateUpdate = function (a) {
 	return {ctor: 'StateUpdate', _0: a};
 };
 var _user$project$Planner$generateSidebar = function (model) {
-	var plannerItem = _elm_lang$core$Native_Utils.eq(model.state, _user$project$Planner$Planner) ? A2(
+	var plannerItem = (_elm_lang$core$Native_Utils.eq(model.state, _user$project$Planner$Planner) || _elm_lang$core$Native_Utils.eq(model.state, _user$project$Planner$PlannerCreate)) ? A2(
 		_elm_lang$html$Html$li,
 		{
 			ctor: '::',
@@ -10491,31 +10767,28 @@ var _user$project$Planner$generateSidebar = function (model) {
 			_1: menuItems
 		});
 };
-var _user$project$Planner$generatePlannerItems = function (_p14) {
-	var _p15 = _p14;
-	var _p19 = _p15.plannerItems;
-	if (_elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(_p19),
-		0)) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
+var _user$project$Planner$generatePlannerItems = function (_p20) {
+	var _p21 = _p20;
+	var _p30 = _p21.plannerItems;
+	var _p29 = _p21;
+	var _p28 = _p21.datePicker;
+	var _p27 = _p21.currentTime;
+	var _p22 = _p21.state;
+	switch (_p22.ctor) {
+		case 'Planner':
+			if (_elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$List$length(_p30),
+				0)) {
+				return A2(
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('container noplanning'),
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+								_1: {ctor: '[]'}
+							}),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -10524,139 +10797,782 @@ var _user$project$Planner$generatePlannerItems = function (_p14) {
 							_elm_lang$html$Html$h3,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$style(
-									{
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
-										_1: {ctor: '[]'}
-									}),
+								_0: _elm_lang$html$Html_Attributes$class('display-2'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('you don\'t currently have anything today (hooray!)'),
+								_0: _elm_lang$html$Html$text('Upcoming Items'),
 								_1: {ctor: '[]'}
 							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{
+						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('container noplanning'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$h3,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$style(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('you don\'t currently have anything to do (hooray!)'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									_user$project$Planner$StateUpdate(_user$project$Planner$PlannerCreate)),
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('container rightside'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_user$project$Planner$StateUpdate(_user$project$Planner$PlannerCreate)),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Click Here to Make More!'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('completed'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$ul,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('list-group'),
+															_1: {ctor: '[]'}
+														},
+														_user$project$Planner$generateCompleted(_p29)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}),
 								_1: {ctor: '[]'}
 							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Click Here to Make More!'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			});
-	} else {
-		var listItems = A2(
-			_elm_lang$core$List$map,
-			function (_p16) {
-				var _p17 = _p16;
-				var _p18 = _p17._1;
-				return A2(
-					_elm_lang$html$Html$li,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _p17._0,
-								_1: {
+						}
+					});
+			} else {
+				var listItems = A2(
+					_elm_lang$core$List$indexedMap,
+					F2(
+						function (index, e) {
+							var _p23 = e;
+							var n = _p23._0;
+							var d = _p23._1;
+							return A2(
+								_elm_lang$html$Html$li,
+								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										A2(_user$project$Planner$getDaysUntil, _p18, _p15.currentTime)),
+									_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 									_1: {
 										ctor: '::',
-										_0: _user$project$Planner$formatDueDate(_p18),
+										_0: _elm_lang$html$Html_Attributes$style(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'margin', _1: '10px'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '5px'},
+													_1: {ctor: '[]'}
+												}
+											}),
 										_1: {ctor: '[]'}
 									}
-								}
-							}),
-						_1: {ctor: '[]'}
-					});
-			},
-			_p19);
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$style(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'width', _1: '50%'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: n,
+											_1: {
+												ctor: '::',
+												_0: A2(_user$project$Planner$getDaysUntil, d, _p27),
+												_1: {
+													ctor: '::',
+													_0: _user$project$Planner$formatDueDate(d),
+													_1: {ctor: '[]'}
+												}
+											}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('pull-right'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$style(
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'width', _1: '45%'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+																	_1: {ctor: '[]'}
+																}
+															}
+														}),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$button,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('checkcontainer'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(
+																_user$project$Planner$CompleteItem(index)),
+															_1: {ctor: '[]'}
+														}
+													},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$img,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('checkmark'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$src('checkmark1.png'),
+																	_1: {ctor: '[]'}
+																}
+															},
+															{ctor: '[]'}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$button,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('xcontainer'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onClick(
+																	_user$project$Planner$RemoveItem(index)),
+																_1: {ctor: '[]'}
+															}
+														},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$img,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('checkmark'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$src('redx1.png'),
+																		_1: {ctor: '[]'}
+																	}
+																},
+																{ctor: '[]'}),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}
+								});
+						}),
+					_p30);
+				return A2(
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('container noplanning'),
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+								_1: {ctor: '[]'}
+							}),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$ul,
+							_elm_lang$html$Html$h3,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('list-group'),
+								_0: _elm_lang$html$Html_Attributes$class('display-2'),
 								_1: {ctor: '[]'}
 							},
-							listItems),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Upcoming Items'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('container noplanning'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$ul,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('list-group'),
+											_1: {ctor: '[]'}
+										},
+										listItems),
+									_1: {ctor: '[]'}
+								}),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									_user$project$Planner$StateUpdate(_user$project$Planner$PlannerCreate)),
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('container rightside'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-lg buttn-rgt'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_user$project$Planner$StateUpdate(_user$project$Planner$PlannerCreate)),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Click Here to Make More!'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('completed'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$ul,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('list-group'),
+															_1: {ctor: '[]'}
+														},
+														_user$project$Planner$generateCompleted(_p29)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}),
 								_1: {ctor: '[]'}
 							}
-						},
-						{
+						}
+					});
+			}
+		case 'PlannerCreate':
+			if (_elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$List$length(_p30),
+				0)) {
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h3,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('display-2'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Upcoming Items'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Click Here to Make More!'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			});
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('container noplanning'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$h3,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$style(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('you don\'t currently have anything today (hooray!)'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('container sideplanning'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('form-group'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$label,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$style(
+															{
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'for', _1: 'newName'},
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Task Name'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$input,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$type_('text'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$placeholder('Task Name'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onInput(_user$project$Planner$NewTaskName),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('form-control'),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$id('newName'),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																}
+															}
+														},
+														{ctor: '[]'}),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('form-group'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$label,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Due Date'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$map,
+															_user$project$Planner$ToDatePicker,
+															_Bogdanp$elm_datepicker$DatePicker$view(_p28)),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$style(
+															{
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('btn btn-danger btn-lg buttn-lft'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$CancelTask),
+																	_1: {ctor: '[]'}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Cancel'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: _user$project$Planner$validateNewTask(_p29),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					});
+			} else {
+				var listItems = A2(
+					_elm_lang$core$List$map,
+					function (_p24) {
+						var _p25 = _p24;
+						var _p26 = _p25._1;
+						return A2(
+							_elm_lang$html$Html$li,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'margin', _1: '10px'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '5px'},
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _p25._0,
+										_1: {
+											ctor: '::',
+											_0: A2(_user$project$Planner$getDaysUntil, _p26, _p27),
+											_1: {
+												ctor: '::',
+												_0: _user$project$Planner$formatDueDate(_p26),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							});
+					},
+					_p30);
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h3,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('display-2'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Upcoming Items'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('container noplanning'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$ul,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('list-group'),
+											_1: {ctor: '[]'}
+										},
+										listItems),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('container sideplanning'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('form-group'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$label,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$style(
+															{
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'for', _1: 'newName'},
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Task Name'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$input,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$type_('text'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$placeholder('Task Name'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onInput(_user$project$Planner$NewTaskName),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('form-control'),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$id('newName'),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																}
+															}
+														},
+														{ctor: '[]'}),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('form-group'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$label,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Due Date'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$map,
+															_user$project$Planner$ToDatePicker,
+															_Bogdanp$elm_datepicker$DatePicker$view(_p28)),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$style(
+															{
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('btn btn-danger btn-lg buttn-lft'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onClick(_user$project$Planner$CancelTask),
+																	_1: {ctor: '[]'}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Cancel'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: _user$project$Planner$validateNewTask(_p29),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					});
+			}
+		default:
+			return _elm_lang$html$Html$text('ERROR');
 	}
 };
 var _user$project$Planner$generateContent = function (model) {
-	var _p20 = model.state;
-	switch (_p20.ctor) {
+	var _p31 = model.state;
+	switch (_p31.ctor) {
 		case 'Start':
 			return A2(
 				_elm_lang$html$Html$div,
@@ -10742,52 +11658,28 @@ var _user$project$Planner$generateContent = function (model) {
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$h2,
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('display-1'),
+							_0: _elm_lang$html$Html_Attributes$class('jumbotron'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Add a new item to your agenda'),
+							_0: A2(
+								_elm_lang$html$Html$h1,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Items on Your Agenda'),
+									_1: {ctor: '[]'}
+								}),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$h3,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('text-muted'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('fill out the form below to create a new task'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$style(
-										{
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10%'},
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _user$project$Planner$generateNewPlannerItem(model),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_0: _user$project$Planner$generatePlannerItems(model),
+						_1: {ctor: '[]'}
 					}
 				});
 		default:
@@ -10834,18 +11726,14 @@ var _user$project$Planner$view = function (model) {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$id('page-content-wrapper'),
-						_1: {ctor: '[]'}
-					},
+					{ctor: '[]'},
 					{
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$div,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('container-fluid'),
+								_0: _elm_lang$html$Html_Attributes$class('container maincontainer'),
 								_1: {ctor: '[]'}
 							},
 							{
