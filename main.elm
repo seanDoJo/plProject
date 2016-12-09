@@ -1,7 +1,7 @@
 module Planner exposing (..)
 
 import Date exposing (Date, Day(..), day, dayOfWeek, month, year)
-import DatePicker exposing (defaultSettings)
+import DatePicker exposing (defaultSettings, Msg)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -28,8 +28,8 @@ type State
 
 type alias Model =
   { state : State
-  , plannerItems : List ((Html Msg, Maybe Date))
-  , completedItems : List ((Html Msg, Maybe Date))
+  , plannerItems : List ((String, Maybe Date))
+  , completedItems : List ((String, Maybe Date))
   , newTaskName : String
   , date : Maybe Date
   , datePicker : DatePicker.DatePicker
@@ -60,6 +60,18 @@ refreshDatePicker =
   in
     (datePicker, Cmd.map ToDatePicker datePickerFx)
 
+setDatePicker : Date -> (DatePicker.DatePicker, Cmd Msg)
+setDatePicker d =
+  let
+    ( datePicker, datePickerFx ) =
+      DatePicker.init
+        { defaultSettings
+            | inputClassList = [ ( "form-control", True ) ]
+            , inputName = Just "date"
+            , pickedDate = Just d
+    }
+  in
+    (datePicker, Cmd.map ToDatePicker datePickerFx)
 -- UPDATE
 
 type Msg
@@ -72,6 +84,7 @@ type Msg
   | CompleteItem Int
   | RemoveItem Int
   | Replace Int
+  | EditTask Int
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -86,7 +99,7 @@ update msg model =
         uitems = updatePlanner model
       in
         ({model | newTaskName = "", plannerItems = uitems, state = Planner, date = Nothing, datePicker = dp}, c)
-
+ 
     CancelTask ->
       let
         (dp, c) = refreshDatePicker
@@ -128,6 +141,20 @@ update msg model =
         updated = updatePlannerItem item model
       in
         ({model | plannerItems = updated, completedItems = remaining}, Cmd.none)
+
+    EditTask index ->
+      let
+        (name, date) = selectItem index model.plannerItems
+        remaining = removeItem index model.plannerItems
+      in
+        case date of 
+          Just d ->
+            let
+              (newDp, c) = setDatePicker d
+            in
+              ({model | plannerItems = remaining, state = PlannerCreate, newTaskName = name, date = (Just d), datePicker = newDp}, c)
+      
+          _ -> (model, Cmd.none)
 
 -- VIEW
 
@@ -221,7 +248,7 @@ generatePlannerItems ({plannerItems, currentTime, state, datePicker} as model) =
                   in
                     li [ class "list-group-item" , style [ ("margin", "10px"), ("border-radius", "5px") ] ] 
                     [ div [ style [ ("width", "50%"), ("display", "inline-block") ] ] 
-                      [ n
+                      [ a [ style [ ("text-decoration", "none"), ("cursor", "pointer") ], onClick (EditTask index) ] [ h3 [] [ text n ] ]
                       , (getDaysUntil d currentTime)
                       , formatDueDate d 
                       ]
@@ -247,16 +274,16 @@ generatePlannerItems ({plannerItems, currentTime, state, datePicker} as model) =
           if (List.length plannerItems) == 0 then
             div [] 
             [ h3 [ class "display-2" ] [ text "Upcoming Items" ]
-            , div [ class "container noplanning" ] [ h3 [ style [ ("color", "white") ] ] [ text "you don't currently have anything today (hooray!)" ] ]
+            , div [ class "container noplanning" ] [ h3 [ style [ ("color", "white") ] ] [ text "you don't currently have anything to do (hooray!)" ] ]
             , div [ class "container sideplanning" ]
               [ div [ class "form-group" ] 
                 [ label [ style [ ("for", "newName") ] ] [ text "Task Name" ]
-                , input [ type_ "text", placeholder "Task Name", onInput NewTaskName, class "form-control", id "newName" ] [] 
+                , input [ type_ "text", placeholder "Task Name", onInput NewTaskName, class "form-control", id "newName", value model.newTaskName ] [] 
                 ]
               , div [ class "form-group" ]
                 [ label [] [ text "Due Date" ]
                 , Html.map ToDatePicker (DatePicker.view datePicker)
-                ]
+                ] 
               , div[ style [ ("margin-top", "10px") ] ]
                 [ button [ class "btn btn-danger btn-lg buttn-lft" , onClick CancelTask ] [ text "Cancel" ]
                 , validateNewTask model
@@ -269,7 +296,7 @@ generatePlannerItems ({plannerItems, currentTime, state, datePicker} as model) =
                 List.map (\(n,d) -> 
                   li [ class "list-group-item" , style [ ("margin", "10px"), ("border-radius", "5px") ]] 
                   [ div [] 
-                    [ n
+                    [ h3 [] [ text n ]
                     , (getDaysUntil d currentTime)
                     , formatDueDate d 
                     ]
@@ -282,12 +309,12 @@ generatePlannerItems ({plannerItems, currentTime, state, datePicker} as model) =
               , div [ class "container sideplanning" ]
                 [ div [ class "form-group" ] 
                   [ label [ style [ ("for", "newName") ] ] [ text "Task Name" ]
-                  , input [ type_ "text", placeholder "Task Name", onInput NewTaskName, class "form-control", id "newName" ] [] 
+                  , input [ type_ "text", placeholder "Task Name", onInput NewTaskName, class "form-control", id "newName", value model.newTaskName ] [] 
                   ]
                 , div [ class "form-group" ]
                   [ label [] [ text "Due Date" ]
                   , Html.map ToDatePicker (DatePicker.view datePicker)
-                  ]
+                  ] 
                 , div[ style [ ("margin-top", "10px") ] ]
                   [ button [ class "btn btn-danger btn-lg buttn-lft" , onClick CancelTask ] [ text "Cancel" ]
                   , validateNewTask model
@@ -312,24 +339,24 @@ validateNewTask model =
     Nothing -> button [ class "btn btn-info btn-lg buttn-rgt" , onClick NewTask, disabled True ] [ text "Add Task" ]
 
 
-updatePlanner : Model -> List ((Html Msg, Maybe Date))
+updatePlanner : Model -> List ((String, Maybe Date))
 updatePlanner model =
   let
-    newItem = h3 [ style [] ] [ text model.newTaskName ]
+    newItem = model.newTaskName
   in
     let
       newL = (newItem, model.date) :: model.plannerItems
     in
       List.sortWith comparePlannerItems newL
 
-updatePlannerItem : (Html Msg, Maybe Date) -> Model -> List ((Html Msg, Maybe Date))
+updatePlannerItem : (String, Maybe Date) -> Model -> List ((String, Maybe Date))
 updatePlannerItem item model =
   let
     newL = item :: model.plannerItems
   in
     List.sortWith comparePlannerItems newL
 
-updateCompleted : (Html Msg, Maybe Date) -> Model -> List ((Html Msg, Maybe Date))
+updateCompleted : (String, Maybe Date) -> Model -> List ((String, Maybe Date))
 updateCompleted item model =
   item :: model.completedItems
 
@@ -388,8 +415,8 @@ getDaysUntil d dtn =
   case d of
     Just date ->
       let
-        dt = Date.toTime date
-        df = dt - dtn
+        dt = (Date.toTime date) + 86399999
+        df = (dt - dtn)
       in
         if df <= 0 then
           span [ style [ ("color", "red") ] ] [ text "Task is Overdue!" ]
@@ -397,39 +424,42 @@ getDaysUntil d dtn =
           let
             days = milliToDays df
             weeks = milliToWeeks df
+            (daysn, drem)  = milliToDaysn df
+            (weeksn, wrem) = milliToWeeksn df
           in
             if weeks == "" && days == "" then
               span [ style [ ("color", "red") ] ] [ text "Due Today!" ]
-            else
-              let
-                daysn = milliToDaysn df
-                weeksn = milliToWeeksn df
-              in
-                if (weeksn <= 0) then
-                  if (daysn <= 3) then
-                    span [ style [ ("color", "red") ] ] [ text ("Due in " ++ weeks ++ days) ]
-                  else
-                    if (daysn <= 5) then
-                      span [ style [ ("color", "orange") ] ] [ text ("Due in " ++ weeks ++ days) ]
-                    else
-                      span [ style [ ("color", "green") ] ] [ text ("Due in " ++ weeks ++ days) ]
+            else     
+              if (weeksn <= 0) then
+                if (daysn <= 3) then
+                  span [ style [ ("color", "red") ] ] [ text ("Due in " ++ weeks ++ days) ]
                 else
-                  span [ style [ ("color", "green") ] ] [ text ("Due in " ++ weeks ++ days) ]
+                  if (daysn <= 5) then
+                    span [ style [ ("color", "orange") ] ] [ text ("Due in " ++ weeks ++ days) ]
+                  else
+                    span [ style [ ("color", "green") ] ] [ text ("Due in " ++ weeks ++ days) ]
+              else
+                span [ style [ ("color", "green") ] ] [ text ("Due in " ++ weeks ++ days) ]
     Nothing -> text "ERROR"
 
 milliToDays : Float -> String
 milliToDays m =
   let
-    days = (ceiling (m / (1000 * 60 * 60 * 24))) % 7
+    (days, rem) = milliToDaysn m
   in
     if days > 0 then
        (toString days) ++ " Days"
     else
       ""
 
-milliToDaysn : Float -> Int
+milliToDaysn : Float -> (Int, Float)
 milliToDaysn m =
-  (ceiling (m / (1000 * 60 * 60 * 24))) % 7
+  let
+    days = (ceiling (m / (1000 * 60 * 60 * 24))) % 7
+    daysm = (toFloat (days * (1000 * 60 * 60 * 24))) / m
+    rem = (m - daysm)
+  in
+    ((days - 1), rem)
 
 milliToWeeks : Float -> String
 milliToWeeks w =
@@ -440,11 +470,16 @@ milliToWeeks w =
       (toString weeks) ++ " Weeks "
     else
       ""
-milliToWeeksn : Float -> Int
+milliToWeeksn : Float -> (Int, Float)
 milliToWeeksn w =
-  floor (w / (1000 * 60 * 60 * 24 * 7))
+  let
+    weeks = floor (w / (1000 * 60 * 60 * 24 * 7))
+    weeksm = (toFloat (weeks * (1000 * 60 * 60 * 24 * 7))) / w
+    rem = w - weeksm
+  in
+    (weeks, rem)  
 
-removeItem : Int -> List ((Html Msg, Maybe Date)) -> List ((Html Msg, Maybe Date))
+removeItem : Int -> List ((String, Maybe Date)) -> List ((String, Maybe Date))
 removeItem i s =
   let
     firstTaken = List.take i s
@@ -452,7 +487,7 @@ removeItem i s =
   in
     (firstTaken ++ firstDropped)
 
-selectItem : Int -> List ((Html Msg, Maybe Date)) -> (Html Msg, Maybe Date)
+selectItem : Int -> List ((String, Maybe Date)) -> (String, Maybe Date)
 selectItem i s =
   let
     firstTaken = List.take (i+1) s
@@ -460,7 +495,7 @@ selectItem i s =
   in
     case item of
       it::rest -> it
-      _ -> (text "ERROR", Nothing)
+      _ -> ("ERROR", Nothing)
 
 generateCompleted : Model -> List(Html Msg)
 generateCompleted model =
@@ -470,7 +505,7 @@ generateCompleted model =
     in
       li [ class "list-group-item" , style [ ("margin", "10px"), ("border-radius", "5px") ] ] 
         [ div [ style [ ("width", "50%"), ("display", "inline-block") ] ] 
-          [ n
+          [ h3 [] [ text n ]
           , text "Completed"
           ]
         , div [ class "pull-right", style [ ("width", "45%"), ("float", "right"), ("display", "inline-block") ] ]
